@@ -940,7 +940,6 @@ export default function AirplaneTakeoffScroll() {
           </Suspense>
         </Canvas>
 
-        {/* HUD Flight Header */}
         <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-between p-4 sm:p-6">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
