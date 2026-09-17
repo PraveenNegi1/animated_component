@@ -956,7 +956,6 @@ export default function AirplaneTakeoffScroll() {
           </div>
         </header>
 
-        {/* Scroll Callout */}
         <div className="pointer-events-none absolute inset-x-0 bottom-6 z-20 flex justify-center">
           <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-slate-950/80 backdrop-blur-md text-xs font-mono text-amber-200/90 shadow-xl">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
