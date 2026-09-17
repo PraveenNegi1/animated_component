@@ -919,7 +919,6 @@ export default function AirplaneTakeoffScroll() {
             shadow-bias={-0.0001}
           />
 
-          {/* Cool Mountain Valley Fill Light */}
           <directionalLight
             position={[-100, 60, -40]}
             intensity={1.8}
