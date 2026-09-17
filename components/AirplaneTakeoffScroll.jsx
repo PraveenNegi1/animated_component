@@ -848,7 +848,6 @@ export default function AirplaneTakeoffScroll() {
       );
 
       // ---------------------------------------------------------------------
-      // PHASE 10: ROLLOUT & BRAKING (Reverse thrust, nose settled)
       // ---------------------------------------------------------------------
       tl.to(
         t,
