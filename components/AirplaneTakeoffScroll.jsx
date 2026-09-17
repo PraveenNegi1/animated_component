@@ -903,7 +903,6 @@ export default function AirplaneTakeoffScroll() {
           camera={{ position: [0, 4.6, 104], fov: 42, near: 0.5, far: 1800 }}
           className="h-full w-full"
         >
-          {/* Depth Fog */}
           <fog attach="fog" args={["#1e293b", 320, 1400]} />
 
           {/* Ambient Lighting */}
