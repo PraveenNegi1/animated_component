@@ -11,8 +11,13 @@ import { memo, useEffect, useRef, useState } from 'react';
  *   import TileRing from '@/components/TileRing';
  *   export default function Page() { return <TileRing />; }
  *
- * Use your own photos: add `img: '/photo.jpg'` to any entry in TILES.
- * Text inside tiles uses cqw units, so artwork scales with each tile.
+ * Photos: put files in /public/images/ and reference them as '/images/photo-1.jpg'.
+ * Every tile can have:
+ *   label  - title (shown on the tile and in the centre caption)
+ *   text   - short description (shown on the tile and in the centre caption)
+ *   img    - photo path or URL (skips `render`)
+ *   render - custom artwork (used when there is no `img`)
+ * Text inside tiles uses cqw units, so it scales with each tile.
  */
 
 /* ------------------------------------------------------------------ */
@@ -44,14 +49,37 @@ const Portrait = ({ id, from, to, skin, hair = '#0c0c0c', shades = true, shift =
 );
 
 const TILES = [
+  /* ---- photo tiles: replace the paths with your own images ---- */
+  {
+    id: 'photo-1',
+    label: 'Studio Light',
+    text: 'Soft shadows and honest textures.',
+    img: '/images/photo-1.jpg',
+  },
+  {
+    id: 'photo-2',
+    label: 'Open Road',
+    text: 'Fieldwork from the northern route.',
+    img: '/images/photo-2.jpg',
+  },
+  {
+    id: 'photo-3',
+    label: 'Quiet Forms',
+    text: 'Shape, balance, and negative space.',
+    img: '/images/photo-3.jpg',
+  },
+
+  /* ---- artwork tiles ---- */
   {
     id: 'portrait-a',
     label: 'Noir Study',
+    text: 'A portrait in low contrast.',
     render: () => <Portrait id="a" from="#2d2d2d" to="#0a0a0a" skin="#d8b9a4" shift={-4} />,
   },
   {
     id: 'serif-s',
     label: 'Serif S',
+    text: 'One letter, set large and confident.',
     render: () => (
       <div className="grid h-full w-full place-items-center bg-[#0d1a3b]">
         <span
@@ -66,6 +94,7 @@ const TILES = [
   {
     id: 'red-x',
     label: 'Cross Mark',
+    text: 'A bold mark in signal red.',
     render: () => (
       <div className="grid h-full w-full place-items-center bg-[#fafafa]">
         <svg viewBox="0 0 100 100" className="h-[82%] w-[82%]">
@@ -78,6 +107,7 @@ const TILES = [
   {
     id: 'red-leather',
     label: 'Oxblood Leather',
+    text: 'Deep colour with a stitched edge.',
     render: () => (
       <svg viewBox="0 0 100 100" className="h-full w-full" preserveAspectRatio="xMidYMid slice">
         <defs>
@@ -101,6 +131,7 @@ const TILES = [
   {
     id: 'form',
     label: 'Form',
+    text: 'Four letters, one grid.',
     render: () => (
       <div className="grid h-full w-full grid-cols-2 grid-rows-2 gap-[1.5%] bg-[#0b0b0b] p-[1.5%]">
         {['F', 'O', 'R', 'M'].map((l) => (
@@ -116,6 +147,7 @@ const TILES = [
   {
     id: 'silver-ribbon',
     label: 'Chrome Fold',
+    text: 'Polished metal, folded once.',
     render: () => (
       <svg viewBox="0 0 100 100" className="h-full w-full" preserveAspectRatio="xMidYMid slice">
         <defs>
@@ -140,6 +172,7 @@ const TILES = [
   {
     id: 'portrait-b',
     label: 'Profile',
+    text: 'Side light, no distractions.',
     render: () => (
       <Portrait id="b" from="#1b1b1b" to="#000" skin="#c9a58f" hair="#050505" shades={false} shift={6} />
     ),
@@ -147,12 +180,15 @@ const TILES = [
   {
     id: 'portrait-c',
     label: 'Shade',
+    text: 'Dark glasses, steady gaze.',
     render: () => <Portrait id="c" from="#3a3a3a" to="#111" skin="#b98f78" shift={-2} />,
   },
   {
     id: 'echo',
     label: 'Echo',
+    text: 'One word, repeated.',
     bare: true,
+    hideCaption: true, // artwork is already text, so skip the caption bar
     render: () => (
       <div className="flex h-full w-full flex-col justify-end">
         {[0, 1, 2].map((n) => (
@@ -170,6 +206,7 @@ const TILES = [
   {
     id: 'red-sphere',
     label: 'Vermilion Orb',
+    text: 'A single sphere, lit from above.',
     render: () => (
       <div className="grid h-full w-full place-items-center bg-[#240407]">
         <div
@@ -185,6 +222,7 @@ const TILES = [
   {
     id: 'specimen',
     label: 'Type Specimen',
+    text: 'Letterforms at their best.',
     render: () => (
       <div className="flex h-full w-full flex-col items-center justify-center bg-[#f6f6f4]">
         <span className="font-serif leading-none text-[#0b0b0b]" style={{ fontSize: '58cqw' }}>
@@ -202,6 +240,7 @@ const TILES = [
   {
     id: 'portrait-d',
     label: 'Daylight',
+    text: 'Natural light, natural tones.',
     render: () => (
       <Portrait id="d" from="#efefef" to="#bdbdbd" skin="#6b4a3b" hair="#111" shades={false} />
     ),
@@ -209,6 +248,7 @@ const TILES = [
   {
     id: 'vase',
     label: 'Clay Vase',
+    text: 'Hand-shaped and left unglazed.',
     render: () => (
       <div className="relative h-full w-full bg-[#e8dfd2]">
         <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
@@ -228,6 +268,7 @@ const TILES = [
   {
     id: 'orbit-dot',
     label: 'Signal',
+    text: 'A small red dot that says go.',
     render: () => (
       <div className="grid h-full w-full place-items-center bg-[#0b0b0b]">
         <div className="h-[34%] w-[34%] rounded-full bg-[#e5222c]" />
@@ -242,13 +283,14 @@ const TILES = [
 
 const COUNT = TILES.length;
 const STEP = 360 / COUNT; // degrees per tick
-const TICK_MS = 3000; // auto-rotate every 3 seconds
+const SECONDS_PER_TILE = 3; // one tile slot every 3 seconds, as a constant glide
+const AUTO_SPEED = STEP / SECONDS_PER_TILE; // degrees per second
 const DEG_PER_VIEWPORT = 110; // scroll: degrees of rotation per viewport of scroll
 const START = 196; // angle of tile 0 (0 = 3 o'clock, grows clockwise)
 const PEAK = 42; // angle where tiles are largest (lower right)
 const MIN_SCALE = 0.06;
 const TILE_RATIO = 0.56; // tile size relative to ring radius
-const OMEGA = 5.2; // spring speed: higher = snappier
+const OMEGA = 6; // scroll spring: higher = snappier, lower = softer
 const MAX_RADIUS = 760;
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -330,12 +372,31 @@ const TileLayer = memo(function TileLayer({ refs }) {
           <div className="relative h-full w-full overflow-hidden" style={{ containerType: 'size' }}>
             {tile.img ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={tile.img} alt="" draggable={false} className="h-full w-full object-cover" />
+              <img src={tile.img} alt={tile.label} draggable={false} className="h-full w-full object-cover" />
             ) : (
               tile.render()
             )}
+
             {!tile.bare && (
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-black/10 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]" />
+            )}
+
+            {/* caption: title + short text, scales with the tile */}
+            {tile.text && !tile.hideCaption && (
+              <div
+                className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+                style={{ padding: '18cqw 6cqw 6cqw' }}
+              >
+                <p className="font-serif leading-tight text-white" style={{ fontSize: '8.5cqw' }}>
+                  {tile.label}
+                </p>
+                <p
+                  className="font-sans leading-snug text-white/80"
+                  style={{ fontSize: '5cqw', marginTop: '1.5cqw' }}
+                >
+                  {tile.text}
+                </p>
+              </div>
             )}
           </div>
         </div>
@@ -376,13 +437,12 @@ export default function TileRing() {
     let visible = true;
     let last = 0;
 
-    let pos = reduce ? 0 : -50; // start swept back so the ring spins in on load
+    let auto = 0; // constant clockwise glide, never stops
+    let sp = reduce ? 0 : -50; // smoothed scroll offset (starts swept back for the intro)
     let vel = 0;
-    let tick = 0;
-    let scrollDeg = 0;
+    let pos = 0; // auto + sp
+    let scrollDeg = 0; // raw scroll target
     let activeIdx = 0;
-
-    const target = () => tick * STEP + scrollDeg;
 
     const paint = () => {
       if (!geo) return;
@@ -416,23 +476,29 @@ export default function TileRing() {
       }
     };
 
-    // critically damped spring: smooth start, smooth stop, no overshoot
+    // Auto rotation is a constant-speed glide (no stop and go).
+    // Scroll input goes through a critically damped spring, so it eases in and out.
     const frame = (now) => {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
-      const t = target();
-      const x = pos - t;
+
+      if (!reduce) auto += AUTO_SPEED * dt;
+
+      const x = sp - scrollDeg;
       const tmp = (vel + OMEGA * x) * dt;
       const e = Math.exp(-OMEGA * dt);
       vel = (vel - OMEGA * tmp) * e;
-      pos = t + (x + tmp) * e;
+      sp = scrollDeg + (x + tmp) * e;
+
+      pos = auto + sp;
       paint();
 
-      if (Math.abs(pos - t) < 0.004 && Math.abs(vel) < 0.004) {
-        pos = t;
+      if (reduce && Math.abs(sp - scrollDeg) < 0.004 && Math.abs(vel) < 0.004) {
+        sp = scrollDeg;
         vel = 0;
+        pos = auto + sp;
         paint();
-        running = false; // idle: no frames are scheduled until something changes
+        running = false; // reduced motion: idle until the next scroll
         return;
       }
       raf = requestAnimationFrame(frame);
@@ -497,22 +563,12 @@ export default function TileRing() {
     });
     io.observe(section);
 
-    let timer;
-    if (!reduce) {
-      timer = setInterval(() => {
-        if (document.hidden || !visible) return;
-        tick += 1;
-        wake();
-      }, TICK_MS);
-    }
-
     window.addEventListener('scroll', onScroll, { passive: true });
     measure();
     onScroll();
 
     return () => {
       cancelAnimationFrame(raf);
-      clearInterval(timer);
       ro.disconnect();
       io.disconnect();
       window.removeEventListener('scroll', onScroll);
@@ -583,6 +639,14 @@ export default function TileRing() {
             >
               {TILES[active].label}
             </p>
+            {TILES[active].text && (
+              <p
+                className="mx-auto mt-[0.8em] max-w-[34ch] font-sans leading-relaxed text-neutral-600"
+                style={{ fontSize: 'clamp(11px, calc(var(--lw) * 0.05), 16px)' }}
+              >
+                {TILES[active].text}
+              </p>
+            )}
             <div className="mx-auto mt-[1.1em] flex items-center justify-center gap-3">
               <span className="h-px w-8 bg-[#e5222c]" />
               <span
