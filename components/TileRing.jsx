@@ -12,268 +12,102 @@ import { memo, useEffect, useRef, useState } from 'react';
  *   export default function Page() { return <TileRing />; }
  *
  * Photos: put files in /public/images/ and reference them as '/images/photo-1.jpg'.
- * Every tile can have:
- *   label  - title (shown on the tile and in the centre caption)
- *   text   - short description (shown on the tile and in the centre caption)
- *   img    - photo path or URL (skips `render`)
- *   render - custom artwork (used when there is no `img`)
+ * Every tile has:
+ *   img   - photo path or URL
+ *   label - title (shown on the tile and in the centre caption)
+ *   text  - short description (shown on the tile and in the centre caption)
  * Text inside tiles uses cqw units, so it scales with each tile.
  */
 
 /* ------------------------------------------------------------------ */
-/* Tile artwork                                                        */
+/* Tiles: 14 travel scenes. Copy the images folder to /public/images/ (photo-1.svg ... photo-14.svg) */
+/* (or change the `img` paths / use full URLs). Edit label + text freely.            */
 /* ------------------------------------------------------------------ */
 
-const Portrait = ({ id, from, to, skin, hair = '#0c0c0c', shades = true, shift = 0 }) => (
-  <svg viewBox="0 0 100 100" className="h-full w-full" preserveAspectRatio="xMidYMid slice">
-    <defs>
-      <linearGradient id={`bg-${id}`} x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor={from} />
-        <stop offset="1" stopColor={to} />
-      </linearGradient>
-      <linearGradient id={`sk-${id}`} x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stopColor={skin} />
-        <stop offset="1" stopColor="#000" stopOpacity=".55" />
-      </linearGradient>
-    </defs>
-    <rect width="100" height="100" fill={`url(#bg-${id})`} />
-    <g transform={`translate(${shift} 0)`}>
-      <path d="M2 100 C8 74 30 70 50 70 C72 70 92 74 98 100Z" fill="#0a0a0a" />
-      <rect x="43" y="58" width="16" height="16" rx="6" fill={`url(#sk-${id})`} />
-      <ellipse cx="51" cy="44" rx="19" ry="25" fill={`url(#sk-${id})`} />
-      <path d="M30 42 C28 18 46 12 58 16 C72 20 74 34 71 46 C68 34 58 28 46 30 C38 32 34 36 30 42Z" fill={hair} />
-      {shades && <rect x="31" y="38" width="42" height="9" rx="4.5" fill="#020202" />}
-      {shades && <rect x="35" y="39.5" width="14" height="2" rx="1" fill="#fff" opacity=".22" />}
-    </g>
-  </svg>
-);
-
 const TILES = [
-  /* ---- photo tiles: replace the paths with your own images ---- */
   {
     id: 'photo-1',
-    label: 'Studio Light',
-    text: 'Soft shadows and honest textures.',
-    img: '/images/photo-1.jpg',
+    label: 'Himalayan Sunrise',
+    text: 'First light on the high ridges.',
+    img: '/photo-1.svg',
   },
   {
     id: 'photo-2',
-    label: 'Open Road',
-    text: 'Fieldwork from the northern route.',
-    img: '/images/photo-2.jpg',
+    label: 'Palm Beach Sunset',
+    text: 'Warm sand and a slow tide.',
+    img: '/photo-2.svg',
   },
   {
     id: 'photo-3',
-    label: 'Quiet Forms',
-    text: 'Shape, balance, and negative space.',
-    img: '/images/photo-3.jpg',
-  },
-
-  /* ---- artwork tiles ---- */
-  {
-    id: 'portrait-a',
-    label: 'Noir Study',
-    text: 'A portrait in low contrast.',
-    render: () => <Portrait id="a" from="#2d2d2d" to="#0a0a0a" skin="#d8b9a4" shift={-4} />,
+    label: 'Desert Caravan',
+    text: 'Dunes, heat, and long shadows.',
+    img: '/photo-3.svg',
   },
   {
-    id: 'serif-s',
-    label: 'Serif S',
-    text: 'One letter, set large and confident.',
-    render: () => (
-      <div className="grid h-full w-full place-items-center bg-[#0d1a3b]">
-        <span
-          className="font-serif font-bold leading-none text-[#f5f1ea]"
-          style={{ fontSize: '104cqw', transform: 'translateY(-4%)' }}
-        >
-          S
-        </span>
-      </div>
-    ),
+    id: 'photo-4',
+    label: 'Alpine Lake',
+    text: 'Still water below the peaks.',
+    img: '/photo-4.svg',
   },
   {
-    id: 'red-x',
-    label: 'Cross Mark',
-    text: 'A bold mark in signal red.',
-    render: () => (
-      <div className="grid h-full w-full place-items-center bg-[#fafafa]">
-        <svg viewBox="0 0 100 100" className="h-[82%] w-[82%]">
-          <path d="M4 10 H38 L52 36 L66 10 H96 L66 50 L98 92 H62 L50 68 L34 92 H4 L36 50Z" fill="#e5222c" />
-          <path d="M52 36 L66 10 H96 L72 42Z" fill="#b3101a" opacity=".55" />
-        </svg>
-      </div>
-    ),
+    id: 'photo-5',
+    label: 'Island Escape',
+    text: 'Turquoise water, nobody around.',
+    img: '/photo-5.svg',
   },
   {
-    id: 'red-leather',
-    label: 'Oxblood Leather',
-    text: 'Deep colour with a stitched edge.',
-    render: () => (
-      <svg viewBox="0 0 100 100" className="h-full w-full" preserveAspectRatio="xMidYMid slice">
-        <defs>
-          <linearGradient id="lea" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#3a070b" />
-            <stop offset=".5" stopColor="#8e1620" />
-            <stop offset="1" stopColor="#2a0508" />
-          </linearGradient>
-          <radialGradient id="leaGlow" cx=".7" cy=".2" r=".7">
-            <stop offset="0" stopColor="#fff" stopOpacity=".3" />
-            <stop offset="1" stopColor="#fff" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <rect width="100" height="100" fill="url(#lea)" />
-        <rect width="100" height="100" fill="url(#leaGlow)" />
-        <path d="M0 70 C30 56 62 78 100 62" fill="none" stroke="#000" strokeWidth="6" opacity=".25" />
-        <path d="M0 62 C30 48 62 70 100 54" fill="none" stroke="#e9b09b" strokeWidth="1.2" strokeDasharray="4 3" opacity=".85" />
-      </svg>
-    ),
+    id: 'photo-6',
+    label: 'City After Dark',
+    text: 'Neon windows and a late moon.',
+    img: '/photo-6.svg',
   },
   {
-    id: 'form',
-    label: 'Form',
-    text: 'Four letters, one grid.',
-    render: () => (
-      <div className="grid h-full w-full grid-cols-2 grid-rows-2 gap-[1.5%] bg-[#0b0b0b] p-[1.5%]">
-        {['F', 'O', 'R', 'M'].map((l) => (
-          <div key={l} className="grid place-items-center bg-[#fbfbfb]">
-            <span className="font-sans font-black leading-none text-[#0b0b0b]" style={{ fontSize: '40cqw' }}>
-              {l}
-            </span>
-          </div>
-        ))}
-      </div>
-    ),
+    id: 'photo-7',
+    label: 'Balloon Valley',
+    text: 'Dawn flights over green hills.',
+    img: '/photo-7.svg',
   },
   {
-    id: 'silver-ribbon',
-    label: 'Chrome Fold',
-    text: 'Polished metal, folded once.',
-    render: () => (
-      <svg viewBox="0 0 100 100" className="h-full w-full" preserveAspectRatio="xMidYMid slice">
-        <defs>
-          <linearGradient id="sil1" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#ffffff" />
-            <stop offset=".35" stopColor="#a9a9ab" />
-            <stop offset=".55" stopColor="#f2f2f3" />
-            <stop offset="1" stopColor="#6d6d70" />
-          </linearGradient>
-          <linearGradient id="sil2" x1="1" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#2b2b2d" />
-            <stop offset=".5" stopColor="#d9d9db" />
-            <stop offset="1" stopColor="#ffffff" />
-          </linearGradient>
-        </defs>
-        <rect width="100" height="100" fill="#eeeeee" />
-        <path d="M8 70 C20 20 70 8 92 34 C70 30 40 42 30 82Z" fill="url(#sil1)" />
-        <path d="M30 82 C40 42 70 30 92 34 C96 52 74 84 52 92 C42 95 34 92 30 82Z" fill="url(#sil2)" />
-      </svg>
-    ),
+    id: 'photo-8',
+    label: 'Coastal Lighthouse',
+    text: 'A beam over the evening sea.',
+    img: '/photo-8.svg',
   },
   {
-    id: 'portrait-b',
-    label: 'Profile',
-    text: 'Side light, no distractions.',
-    render: () => (
-      <Portrait id="b" from="#1b1b1b" to="#000" skin="#c9a58f" hair="#050505" shades={false} shift={6} />
-    ),
+    id: 'photo-9',
+    label: 'Cherry Blossom Temple',
+    text: 'Spring in old Kyoto.',
+    img: '/photo-9.svg',
   },
   {
-    id: 'portrait-c',
-    label: 'Shade',
-    text: 'Dark glasses, steady gaze.',
-    render: () => <Portrait id="c" from="#3a3a3a" to="#111" skin="#b98f78" shift={-2} />,
+    id: 'photo-10',
+    label: 'Northern Lights',
+    text: 'Green skies over snowy pines.',
+    img: '/photo-10.svg',
   },
   {
-    id: 'echo',
-    label: 'Echo',
-    text: 'One word, repeated.',
-    bare: true,
-    hideCaption: true, // artwork is already text, so skip the caption bar
-    render: () => (
-      <div className="flex h-full w-full flex-col justify-end">
-        {[0, 1, 2].map((n) => (
-          <span
-            key={n}
-            className="font-sans font-black uppercase leading-[0.84] tracking-tighter text-[#d3101f]"
-            style={{ fontSize: '38cqw' }}
-          >
-            Echo
-          </span>
-        ))}
-      </div>
-    ),
+    id: 'photo-11',
+    label: 'Mountain Railway',
+    text: 'A scenic ride through the hills.',
+    img: '/photo-11.svg',
   },
   {
-    id: 'red-sphere',
-    label: 'Vermilion Orb',
-    text: 'A single sphere, lit from above.',
-    render: () => (
-      <div className="grid h-full w-full place-items-center bg-[#240407]">
-        <div
-          className="h-[80%] w-[80%] rounded-full"
-          style={{
-            background: 'radial-gradient(circle at 32% 28%, #ff7a72 0%, #c4161f 38%, #4a060b 78%, #1a0204 100%)',
-            boxShadow: 'inset -4cqw -6cqw 12cqw rgba(0,0,0,.45)',
-          }}
-        />
-      </div>
-    ),
+    id: 'photo-12',
+    label: 'Harbour Sails',
+    text: 'Light wind, bright sails.',
+    img: '/photo-12.svg',
   },
   {
-    id: 'specimen',
-    label: 'Type Specimen',
-    text: 'Letterforms at their best.',
-    render: () => (
-      <div className="flex h-full w-full flex-col items-center justify-center bg-[#f6f6f4]">
-        <span className="font-serif leading-none text-[#0b0b0b]" style={{ fontSize: '58cqw' }}>
-          Aa
-        </span>
-        <span
-          className="mt-[4%] font-sans font-bold uppercase tracking-[0.3em] text-[#0b0b0b]"
-          style={{ fontSize: '7cqw' }}
-        >
-          Bauhaus
-        </span>
-      </div>
-    ),
+    id: 'photo-13',
+    label: 'Starlit Camp',
+    text: 'A tent, a fire, a clear sky.',
+    img: '/photo-13.svg',
   },
   {
-    id: 'portrait-d',
-    label: 'Daylight',
-    text: 'Natural light, natural tones.',
-    render: () => (
-      <Portrait id="d" from="#efefef" to="#bdbdbd" skin="#6b4a3b" hair="#111" shades={false} />
-    ),
-  },
-  {
-    id: 'vase',
-    label: 'Clay Vase',
-    text: 'Hand-shaped and left unglazed.',
-    render: () => (
-      <div className="relative h-full w-full bg-[#e8dfd2]">
-        <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
-          <defs>
-            <linearGradient id="vase" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="#efe5d6" />
-              <stop offset=".6" stopColor="#cdbba2" />
-              <stop offset="1" stopColor="#a8957b" />
-            </linearGradient>
-          </defs>
-          <ellipse cx="50" cy="90" rx="26" ry="4" fill="#000" opacity=".12" />
-          <path d="M44 10 C40 26 62 34 64 56 C66 78 54 90 42 90 C26 90 24 70 36 54 C46 40 38 26 44 10Z" fill="url(#vase)" />
-        </svg>
-      </div>
-    ),
-  },
-  {
-    id: 'orbit-dot',
-    label: 'Signal',
-    text: 'A small red dot that says go.',
-    render: () => (
-      <div className="grid h-full w-full place-items-center bg-[#0b0b0b]">
-        <div className="h-[34%] w-[34%] rounded-full bg-[#e5222c]" />
-      </div>
-    ),
+    id: 'photo-14',
+    label: 'Whitewashed Village',
+    text: 'Blue domes above the Aegean.',
+    img: '/photo-14.svg',
   },
 ];
 
@@ -364,25 +198,23 @@ const TileLayer = memo(function TileLayer({ refs }) {
         <div
           key={tile.id}
           ref={(el) => (refs.current[i] = el)}
-          className={`absolute left-0 top-0 opacity-0 will-change-transform ${
-            tile.bare ? '' : 'shadow-[0_12px_30px_-8px_rgba(0,0,0,0.38)]'
-          }`}
+          className="absolute left-0 top-0 opacity-0 shadow-[0_12px_30px_-8px_rgba(0,0,0,0.38)] will-change-transform"
           style={{ transformOrigin: 'center center' }}
         >
-          <div className="relative h-full w-full overflow-hidden" style={{ containerType: 'size' }}>
-            {tile.img ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={tile.img} alt={tile.label} draggable={false} className="h-full w-full object-cover" />
-            ) : (
-              tile.render()
-            )}
+          <div className="relative h-full w-full overflow-hidden bg-neutral-300" style={{ containerType: 'size' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={tile.img}
+              alt={tile.label}
+              draggable={false}
+              decoding="async"
+              className="h-full w-full object-cover"
+            />
 
-            {!tile.bare && (
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-black/10 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]" />
-            )}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-black/10 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]" />
 
             {/* caption: title + short text, scales with the tile */}
-            {tile.text && !tile.hideCaption && (
+            {tile.text && (
               <div
                 className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
                 style={{ padding: '18cqw 6cqw 6cqw' }}
